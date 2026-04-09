@@ -1,0 +1,684 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>TEST</title>
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-physics-system@v4.2.2/dist/aframe-physics-system.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v7.2.0/dist/aframe-extras.min.js"></script>
+    <script src="https://unpkg.com/aframe-environment-component@1.3.3/dist/aframe-environment-component.min.js"></script>
+  </head>
+  <body>
+    <!-- <div
+      id="overlay"
+      style="
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        z-index: 10;
+        color: white;
+        background: rgba(0, 0, 0, 0.7);
+        padding: 10px;
+        font-family: sans-serif;
+        pointer-events: none;
+      "
+    >
+      Cliquez sur l'écran pour activer l'expérience
+    </div> -->
+    <div
+      id="popup"
+      style="
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 800px; /* Taille agrandie */
+        max-width: 90vw;
+        height: 500px; /* Hauteur agrandie */
+        background: rgba(10, 10, 10, 0.95);
+        color: white;
+        border: 1px solid #00ff00;
+        border-radius: 5px;
+        z-index: 10000;
+        font-family: &quot;Courier New&quot;, monospace;
+        box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+        overflow: hidden; /* Pour que la barre de titre reste en haut */
+      "
+    >
+      <div
+        style="
+          background: #00ff00;
+          color: black;
+          padding: 5px 15px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          font-weight: bold;
+        "
+      >
+        <span>SYSTEM_INFO.EXE</span>
+        <span
+          onclick="document.getElementById('popup').style.display = 'none'"
+          style="cursor: pointer; font-size: 20px; padding: 0 5px"
+        >
+          ✖
+        </span>
+      </div>
+
+      <div
+        id="popup-body"
+        style="
+          padding: 0;
+          overflow: hidden;
+          height: calc(100% - 32px);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: #000;
+        "
+      ></div>
+    </div>
+
+    <a-scene obb-collider="showColliders: false">
+      <a-assets>
+        <img id="texture-sol" src="Textures/WoodFloor051_1K-JPG_Color.jpg" />
+        <img id="texture-mur" src="Textures/old_planks_02_diff_8k.jpg" />
+        <img id="texture-lit" src="Textures/Wood094_1K-JPG_Color.jpg" />
+        <img id="fond" src="Textures/horn-koppe_snow.jpg" />
+        <img id="plafond" src="Textures/Plaster007_1K-JPG_Color.jpg" />
+        <img id="easter_egg_pic" src="Textures/easter_egg.jpg" />
+        <img id="windows" src="Textures/Windows.webp" />
+
+        <a-asset-item id="rCube" src="Modeles/RubikCube.glb"></a-asset-item>
+        <a-asset-item id="bin" src="Modeles/bin.glb"></a-asset-item>
+        <a-assets-item
+          id="chandelier"
+          src="Modeles/chandelier.glb"
+        ></a-assets-item>
+
+        <video id="ForSure" src="ForSure.mp4" autoplay loop="true"></video>
+      </a-assets>
+
+      <a-sky src="#fond"></a-sky>
+      <a-entity
+        gltf-model="https://aframe.io/aframe/examples/showcase/composite/models/clippie/clippie.glb"
+        position="0 1.5 -2"
+      ></a-entity>
+
+      <a-entity id="rig">
+        <a-camera position="0 1.6 0">
+          <a-cursor
+            color="lime"
+            scale="0.1 0.1 0.1"
+            raycaster="objects: .clickable"
+            position="0 0 -0.2"
+          >
+          </a-cursor>
+        </a-camera>
+      </a-entity>
+
+      <a-entity>
+        <a-plane
+          obb-collider
+          color="#444"
+          side="double"
+          height="10"
+          width="10"
+          rotation="-90 0 0"
+          material="src: #texture-sol; repeat: 10 10"
+        ></a-plane>
+        <a-plane
+          obb-collider
+          color="#FFF"
+          side="double"
+          position="0 4 0"
+          height="10"
+          width="10"
+          rotation="-90 0 0"
+          material="src: #plafond"
+        ></a-plane>
+        <a-plane
+          obb-collider
+          position="-5 2 0"
+          rotation="0 90 0"
+          width="10"
+          height="4"
+          depth="10"
+          material="src: #texture-mur; repeat: 5 5; side: double"
+        >
+        </a-plane>
+        <a-plane
+          obb-collider
+          position="5 2 0"
+          rotation="0 -90 0"
+          width="10"
+          height="4"
+          depth="10"
+          material="src: #texture-mur; repeat: 5 5; side: double"
+        >
+        </a-plane>
+        <a-plane
+          obb-collider
+          position="0 2 5"
+          rotation="0 0 0"
+          width="10"
+          height="4"
+          depth="10"
+          material="src: #texture-mur; repeat: 5 5; side: double"
+        >
+        </a-plane>
+        <a-plane
+          obb-collider
+          position="0 2 -5"
+          width="10"
+          height="4"
+          depth="10"
+          material="src: #texture-mur; repeat: 5 5; side: double"
+        >
+        </a-plane>
+
+        <a-text
+          id="monTexte"
+          color="white"
+          value="SALUT"
+          position="0 7 -5"
+          align="center"
+        >
+        </a-text>
+      </a-entity>
+      <a-entity id="lit" position="3.3 0 -1.8">
+        <a-box
+          scale="0.2 0.8 0.2"
+          material="src: #texture-lit; repeat: 10 10"
+        ></a-box>
+        <a-box
+          scale="0.2 0.8 0.2"
+          position="1.5 0 0"
+          material="src: #texture-lit; repeat: 10 10"
+        ></a-box>
+        <a-box
+          scale="0.2 0.8 0.2"
+          position="0 0 -3"
+          material="src: #texture-lit; repeat: 10 10"
+        ></a-box>
+        <a-box
+          scale="0.2 0.8 0.2"
+          position="1.5 0 -3"
+          material="src: #texture-lit; repeat: 10 10"
+        ></a-box>
+        <a-box
+          id="lit"
+          scale="1.7 0.2 3.2"
+          position="0.75 0.4 -1.5"
+          material="src: #texture-lit; repeat: 10 10"
+        ></a-box>
+        <a-box
+          id="lit-tete"
+          scale="1.7 0.8 0.2"
+          position="0.75 0.8 -3"
+          material="src: #texture-lit; repeat: 10 10"
+        ></a-box>
+        <a-box
+          id="matelas"
+          color="#dddddd"
+          scale="1.5 0.2 3.1"
+          position="0.75 0.5 -1.5"
+        ></a-box>
+        <a-cylinder
+          id="polochon"
+          color="#888888"
+          scale=" 0.2 1.5 0.2"
+          position="0.75 0.8 -2.7f"
+          rotation="90 90 0"
+        ></a-cylinder>
+        <a-box
+          id="oreiller"
+          color="#999999"
+          scale="1.2 0.1 0.6"
+          position="0.75 0.8 -2.4"
+          rotation="60"
+        ></a-box>
+      </a-entity>
+      <a-entity id="bureau" rotation="0 90 0" position="-1.3 0 -3.3">
+        <a-box
+          id="planche"
+          material="src: #texture-lit; repeat: 10 10"
+          scale="3 0.2 1"
+          position="0 1 -3"
+        ></a-box>
+        <a-box
+          id="pied"
+          material="src: #texture-lit; repeat: 10 10"
+          scale="1 0.2 1"
+          position="-1.4 0.5 -3"
+          rotation="90 90 0"
+        ></a-box>
+        <a-box
+          id="meuble"
+          material="src: #texture-lit; repeat: 10 10"
+          scale="1 1 1"
+          position="1 0.5 -3"
+          rotation="90 90 0"
+        ></a-box>
+        <a-box
+          id="tiroir-1"
+          color="#bbb"
+          material="src: #texture-lit; repeat: 10 10"
+          scale="1 0.75 0.3"
+          position="1 0.35 -2.95"
+          rotation="90 90 0"
+        ></a-box>
+        <a-box
+          id="tiroir-1"
+          color="#bbb"
+          material="src: #texture-lit; repeat: 10 10"
+          scale="1 0.75 0.3"
+          position="1 0.7 -2.95"
+          rotation="90 90 0"
+        ></a-box>
+      </a-entity>
+      <a-entity id="pc" position="-4.5 1.6 -3" rotation="90">
+        <a-box
+          id="ecran_pc"
+          color="black"
+          class="clickable"
+          scale="0.03 1.5 0.7"
+        ></a-box>
+        <a-text
+          id="Ecole"
+          color="lime"
+          align="center"
+          width="3"
+          position="0.016 0 0"
+          rotation="0 90 -90"
+          visible="false"
+        >
+        </a-text>
+        <a-image
+          id="windowsImage"
+          src="#windows"
+          width="3"
+          position="0.016 0 0"
+          scale="0.48 0.65 0.5"
+          rotation="0 90 -90"
+          visible="false"
+        ></a-image>
+        <a-image
+          id="ecranImage"
+          src="#easter_egg_pic"
+          scale="0.014 0.006 0.004"
+          position="0.02 0 0"
+          rotation="0 90 -90"
+          visible="false"
+        ></a-image>
+        <a-video
+          id="ecranVideo"
+          src="#ForSure"
+          width="0.7"
+          height="1.4"
+          scale="0.4 0.4 0.4"
+          position="0.02 0 0"
+          rotation="0 90 -90"
+          visible="false"
+        >
+        </a-video>
+        <a-box
+          id="pied_pc"
+          color="black"
+          scale="0.15 0.15 0.7"
+          position="-0.09 0 0.3"
+        ></a-box>
+        <a-box
+          id="socle_pc"
+          color="black"
+          scale="0.3 0.01 0.7"
+          position="-0.09 0 0.49"
+          rotation="-90"
+        ></a-box>
+        <a-box
+          id="tour_pc"
+          color="black"
+          scale="0.7 0.4 0.7"
+          position="0.3 0.75 1.2"
+        ></a-box>
+        <a-box
+          id="boutonPower"
+          class="clickable"
+          color="#222"
+          scale="0.02 0.06 0.06"
+          position="0.65 0.75 1.2"
+        ></a-box>
+        <a-entity id="clavier_pc" position="0.4 0 0.49" rotation="-90 -5 0">
+          <a-box id="clavier" color="black" scale="0.3 0.01 1"></a-box>
+          <a-entity id="touche"></a-entity>
+          <a-box
+            id="easter_egg"
+            color="#000111"
+            scale="0.01 0.01 0.01"
+            position="0 0.001 -0.005"
+            class="clickable"
+          ></a-box>
+        </a-entity>
+      </a-entity>
+      <a-entity id="etagere" position="0 0 -4.9">
+        <a-box
+          id="fond"
+          position="0 1.8 0"
+          scale="2 3.6 0.02"
+          material="src: #texture-lit; repeat: 2 4"
+        ></a-box>
+        <a-box
+          id="planche_droite"
+          position="1 1.8 0.24"
+          scale="0.04 3.6 0.5"
+          material="src: #texture-lit; repeat: 2 4"
+        ></a-box>
+        <a-box
+          id="planche_gauche"
+          position="-1 1.8 0.24"
+          scale="0.04 3.6 0.5"
+          material="src: #texture-lit; repeat: 2 4"
+        ></a-box>
+        <a-box
+          id="planche_sup"
+          position="0 3.58 0.24"
+          scale="0.04 2 0.5"
+          rotation="0 0 90"
+          material="src: #texture-lit; repeat: 2 4"
+        ></a-box>
+        <a-box
+          id="piece_bas"
+          position="0 0.1 0.4"
+          scale="0.04 2 0.22"
+          rotation="90 0 90"
+          material="src: #texture-lit; repeat: 2 4"
+        ></a-box>
+        <a-box
+          id="planche_inf"
+          position="0 0.22 0.24"
+          scale="0.04 2 0.5"
+          rotation="0 0 90"
+          material="src: #texture-lit; repeat: 2 4"
+        ></a-box>
+        <a-entity id="planche_int"></a-entity>
+        <a-gltf-model
+          src="#rCube"
+          position="-0.7 1.42 0.2"
+          rotation="0 45 0"
+          scale="300 300 300"
+          material="side: double"
+        ></a-gltf-model>
+      </a-entity>
+
+      <a-gltf-model
+        src="#bin"
+        position="-4.2 0 -1.5"
+        rotation="0 45 0"
+        scale="0.3 0.3 0.3"
+      ></a-gltf-model>
+
+      <a-gltf-model
+        src="#chandelier"
+        position="0 3 0"
+        rotation="0 45 0"
+        scale="1 1 1"
+      >
+        <a-light
+          type="point"
+          color="white"
+          intensity="2"
+          position="0 -0.1 0"
+          distance="20"
+        ></a-light
+      ><a-light
+          type="point"
+          color="white"
+          intensity="1"
+          position="0 0.2 0"
+          distance="20"
+        ></a-light
+      ></a-gltf-model>
+
+      <a-entity id="table"> </a-entity>
+
+      <!-- <a-entity environment="preset: volcano; groundColor: #445; grid: cross"></a-entity> -->
+    </a-scene>
+    <script>
+      const ecranBox = document.querySelector("#ecran_pc");
+      const popupElt = document.getElementById("popup");
+      const popupBody = document.getElementById("popup-body");
+      const container = document.querySelector("#touche");
+      const plancheEtagere = document.querySelector("#planche_int");
+      const ecranTexte = document.querySelector("#Ecole");
+      const ecranImage = document.querySelector("#ecranImage");
+      const ecranVideo = document.querySelector("#ecranVideo");
+      const videoAsset = document.querySelector("#ForSure");
+      const btnPower = document.querySelector("#boutonPower");
+      const btnEaster = document.querySelector("#easter_egg");
+      const ecranWindows = document.querySelector("#windowsImage");
+
+      let toucheActiveID = null;
+      let pcEstAllume = false;
+
+      const contenuEcrans = [
+        { label: "IPSSI", valeur: "IPSSI Nice", type: "texte" },
+        { label: "CYBER", valeur: "Option: Cybersecurite", type: "texte" },
+        { label: "PROJET", valeur: "#ForSure", type: "video" },
+        { label: "JS", valeur: "Skill: JavaScript", type: "texte" },
+        { label: "EXP", valeur: "Experience: Freelance", type: "texte" },
+        { label: "MAIL", valeur: "Contact: nice@ipssi.fr", type: "texte" },
+        { label: "HOBBY", valeur: "Loisirs: Gaming", type: "texte" },
+        { label: "STATUS", valeur: "Status: Disponible", type: "texte" },
+      ];
+
+      const nbLignes = 4;
+      const nbColonnes = 2;
+      const departZ = 0.37;
+      const espacementZ = 0.25;
+      const departX = -0.07;
+      const espacementX = -0.15;
+      const nbPlanche = 5;
+      const departY = 0.72;
+      const espacementY = 0.56;
+
+      let indexTableau = 0;
+
+
+      // Ajoute la classe clickable à l'écran si ce n'est pas fait
+      ecranBox.classList.add("clickable");
+
+      ecranBox.addEventListener("click", function () {
+        if (!pcEstAllume) return; // On ne fait rien si le PC est éteint
+
+        popupBody.innerHTML = ""; // On vide le précédent contenu
+        popupElt.style.display = "block";
+
+        // 1. Vérifie si c'est du TEXTE qui est affiché
+        if (ecranTexte.getAttribute("visible")) {
+          let val = ecranTexte.getAttribute("value");
+          popupBody.innerHTML = `<h2 style="color: lime;">${val}</h2>`;
+        }
+        // 2. Vérifie si c'est une IMAGE (Easter Egg)
+        else if (ecranImage.getAttribute("visible")) {
+          let imgSrc = ecranImage.getAttribute("src");
+          let url = document.querySelector(imgSrc).src;
+
+          // On utilise object-fit: contain pour l'image aussi
+          popupBody.innerHTML = `
+        <img src="${url}" 
+            style="
+                width: 100%; 
+                height: 100%; 
+                object-fit: contain; 
+                display: block; 
+                background: #000; 
+                border-radius: 5px;
+            ">`;
+        }
+        // 3. Vérifie si c'est une VIDÉO
+        else if (ecranVideo.getAttribute("visible")) {
+          let vidSrc = ecranVideo.getAttribute("src");
+          let url = document.querySelector(vidSrc).src;
+
+          // Le style 'object-fit: contain' est la clé pour que ça ne dépasse pas
+          popupBody.innerHTML = `
+        <video src="${url}" controls autoplay loop
+            style="
+                width: 100%; 
+                height: 100%; 
+                max-height: 100%; 
+                object-fit: contain; 
+                display: block; 
+                background: #000;
+                border-radius: 5px;
+            ">
+        </video>`;
+        } else if (
+          ecranWindows.getAttribute("visible") === true ||
+          ecranWindows.getAttribute("visible") === "true"
+        ) {
+          let url = document.querySelector("#windows").src; // On récupère l'image Windows dans les assets
+          popupBody.innerHTML = `
+            <img src="${url}" 
+                 style="width: 100%; height: 90%; object-fit: contain; background: #000; display: block;">`;
+        }
+      });
+
+
+      // Boucle de création des touches
+      for (let c = 0; c < nbColonnes; c++) {
+        for (let l = 0; l < nbLignes; l++) {
+          let touche = document.createElement("a-box");
+          const donneeTouche = contenuEcrans[indexTableau] || {
+            type: "texte",
+            valeur: "Vide",
+            label: "...",
+          };
+          indexTableau++;
+
+          let nouvelleZ = departZ - l * espacementZ;
+          let nouvelleX = departX - c * espacementX;
+
+          touche.setAttribute("color", "#111");
+          touche.setAttribute("scale", "0.12 0.01 0.2");
+          touche.setAttribute("position", `${nouvelleX} 0.005 ${nouvelleZ}`);
+          touche.setAttribute("id", `touche-c${c}-l${l}`);
+          touche.classList.add("clickable");
+
+          // AJOUT DU TEXTE SUR LA TOUCHE
+          let texteLabel = document.createElement("a-text");
+          texteLabel.setAttribute("value", donneeTouche.label);
+          texteLabel.setAttribute("align", "center");
+          texteLabel.setAttribute("width", "1.2");
+          texteLabel.setAttribute("scale", "2 2 2");
+          texteLabel.setAttribute("position", "0 0.6 0");
+          texteLabel.setAttribute("rotation", "-90 0 90");
+          touche.appendChild(texteLabel);
+
+          // ÉVÉNEMENT CLIC TOUCHE
+          touche.addEventListener("click", function () {
+            // --- SÉCURITÉ : Vérifie si le PC est allumé ---
+            if (!pcEstAllume) return;
+
+            // Feedback visuel
+            this.setAttribute("color", "lime");
+            setTimeout(() => {
+              this.setAttribute("color", "#111");
+            }, 200);
+
+            ecranWindows.setAttribute("visible", "false");
+
+            // Logique de bascule
+            if (toucheActiveID === this.id) {
+              ecranWindows.setAttribute("visible", "true");
+              ecranTexte.setAttribute("visible", "false");
+              ecranVideo.setAttribute("visible", "false");
+              videoAsset.pause();
+              toucheActiveID = null;
+            } else {
+              if (donneeTouche.type === "video") {
+                ecranTexte.setAttribute("visible", "false");
+                ecranImage.setAttribute("visible", "false");
+                ecranVideo.setAttribute("visible", "true");
+                videoAsset.play();
+              } else {
+                ecranVideo.setAttribute("visible", "false");
+                ecranImage.setAttribute("visible", "false");
+                videoAsset.pause();
+                ecranTexte.setAttribute("visible", "true");
+                ecranTexte.setAttribute("value", donneeTouche.valeur);
+              }
+              toucheActiveID = this.id;
+            }
+          });
+          container.appendChild(touche);
+        }
+      }
+
+
+
+      for (let p = 0; p < nbPlanche; p++) {
+        let planche = document.createElement("a-box");
+
+        let nvPlancheY = departY + p * espacementY;
+
+        planche.setAttribute("scale", "0.02 2 0.5");
+        planche.setAttribute("rotation", "0 0 90");
+        planche.setAttribute("material", "src: #texture-lit; repeat: 2 4");
+        planche.setAttribute("position", `0 ${nvPlancheY} 0.24`);
+
+        plancheEtagere.appendChild(planche);
+      }
+
+      // 4. ÉVÉNEMENT BOUTON POWER
+      btnPower.addEventListener("click", function () {
+        if (pcEstAllume) {
+          
+          ecranWindows.setAttribute("visible", "false");
+          ecranTexte.setAttribute("visible", "false");
+          ecranVideo.setAttribute("visible", "false");
+          ecranImage.setAttribute("visible", "false");
+          videoAsset.pause();
+          this.setAttribute("color", "#400");
+          pcEstAllume = false;
+          toucheActiveID = null;
+        } else {
+          
+          ecranWindows.setAttribute("visible", "true");
+          this.setAttribute("color", "red");
+          pcEstAllume = true;
+        }
+      });
+      // 5. EVENEMENT BOUTON EASTER EGG
+      btnEaster.addEventListener("click", function () {
+        if (!pcEstAllume) return;
+
+        ecranWindows.setAttribute("visible", "false");
+
+        if (toucheActiveID === this.id) {
+
+          ecranWindows.setAttribute("visible", "true");
+          ecranTexte.setAttribute("visible", "false");
+          ecranImage.setAttribute("visible", "false");
+
+          if (ecranVideo) {
+            ecranVideo.setAttribute("visible", "false");
+            videoAsset.pause();
+          }
+
+          toucheActiveID = null;
+        } else {
+          
+          ecranTexte.setAttribute("visible", "false");
+          ecranVideo.setAttribute("visible", "false");
+          videoAsset.pause();
+
+          ecranImage.setAttribute("visible", "true");
+
+          toucheActiveID = this.id;
+        }
+      });
+    </script>
+  </body>
+</html>
